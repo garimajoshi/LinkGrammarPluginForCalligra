@@ -29,7 +29,7 @@ public:
 	void setDisjunctCount(int count);
 	QString getLanguage();
 	void setLanguage(QString language);
-	void addLanguageToSetOfSupportedLanguagesWitDictionaryPath(QString language, QString dictionaryPath = 0)
+	void addLanguageToSetOfSupportedLanguagesWithDictionaryPath(QString language, QString dictionaryPath = 0)
 private:
 	Dictionary      m_Dict;
 	Parse_Options   m_Opts;
