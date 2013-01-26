@@ -20,17 +20,17 @@ public:
 	~LinkGrammarWrapper();
 	void cleanUp();
 	bool parseSentence(QString givenText);
+	bool isLanguageAvailable(QString language);
 	int getMaxTimeToParseInNumberOfSeconds();
 	void setMaxTimeToParseInNumberOfSeconds(int numberOfSeconds);
 	int getMaxMemoryInMegaBytes;
-	void setMaxMemoryInMegaBytes(int memoryInBytes);
+	void setMaxMemoryInMegaBytes(int memoryInMegaBytes);
 	int getDisjunctCount;
 	void setDisjunctCount(int count);
 	QString getLanguage();
 	void setLanguage(QString language);
-	void addLanguageToSetOfSupportedLanguagesWitDictionaryPath(QString language, QString dictionaryPath)
+	void addLanguageToSetOfSupportedLanguagesWitDictionaryPath(QString language, QString dictionaryPath = 0)
 private:
-	bool isLanguageAvailable(QString);
 	Dictionary      m_Dict;
 	Parse_Options   m_Opts;
 	int m_maxTimeToParseInNumberOfSeconds;
