@@ -13,7 +13,7 @@ extern "C"
 class LinkGrammarWrapper
 {
 public:
-    LinkGrammarWrapper();
+    	LinkGrammarWrapper();
 	LinkGrammarWrapper(Dictionary dict, Parse_Options opts);
 	~LinkGrammarWrapper();
 	bool parseSentence(const QString text) const;
