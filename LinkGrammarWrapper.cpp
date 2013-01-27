@@ -84,7 +84,7 @@ bool LinkGrammarWrapper::setLanguage(QString language)
     m_languagePreference = language;
 }
 
-void LinkGrammarWrapper::addLanguageToSetOfSupportedLanguagesWitDictionaryPath(QString language, QString dictionaryPath = QString())
+void LinkGrammarWrapper::addLanguageToSetOfSupportedLanguages(QString language, QString dictionaryPath = QString())
 {
     m_listOfAvailableLanguages[languages] = dictionaryPath;
 }
