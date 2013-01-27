@@ -128,7 +128,7 @@ bool LinkGrammarWrapper::parseSentence(QString givenSentence)
 	}
 
     /*****
-     * TODO: find out what actually went wrong by allowing null linkages
+     * TODO: find out what actually went wrong by allowing null linkages.
     *******/
     sentence_delete(sent);
 	return res;
