@@ -41,6 +41,6 @@ private:
 	QString m_languagePreference;
     QString m_currentDictionaryLanguage;
 	QMap<QString, QString> m_listOfAvailableLanguages;
-}; 
+};
 
 #endif // LINKGRAMMARWRAPPER_H
