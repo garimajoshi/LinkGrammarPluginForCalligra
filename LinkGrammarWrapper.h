@@ -4,26 +4,23 @@
 class QString;
 class QMap;
 
-#define DEFAULT_LANGUAGE "en"
-
+#ifdef __cplusplus
 extern "C"
 {
 #include <link-grammar/link-includes.h>
-}
+#endif
 
 class LinkGrammarWrapper
 {
 public:
     LinkGrammarWrapper();
-    LinkGrammarWrapper(Dictionary dict, Parse_Options opts);
-    ~LinkGrammarWrapper();
-    bool parseSentence(const QString text) const;
-    void cleanUp();
-    bool isLanguageAvailable(QString language);
+	LinkGrammarWrapper(Dictionary dict, Parse_Options opts);
+	~LinkGrammarWrapper();
+	bool parseSentence(const QString text) const;
+	void cleanUp();
+	bool isLanguageAvailable(QString language);
 	int getMaxTimeToParseInNumberOfSeconds();
 	void setMaxTimeToParseInNumberOfSeconds(int numberOfSeconds);
-	int getMaxMemoryInMegaBytes;
-	void setMaxMemoryInMegaBytes(int memoryInMegaBytes);
 	int getDisjunctCount;
 	void setDisjunctCount(int count);
 	QString getLanguage();
@@ -31,16 +28,19 @@ public:
 	void addLanguageToSetOfSupportedLanguages(QString language, QString dictionaryPath = 0);
 
 private:
-    void cleanUpDictionary();
-    void cleanUpParseOptions();
-    Dictionary m_dict;
-    Parse_Options m_opts;
-    int m_maxTimeToParseInNumberOfSeconds;
-    int m_maxMemoryInMegaBytes;
+	void cleanUpDictionary();
+	void cleanUpParseOptions();
+	Dictionary m_Dict;
+	Parse_Options m_Opts;
+	int m_maxTimeToParseInNumberOfSeconds;
 	int m_disjunctCount;
 	QString m_languagePreference;
-    QString m_currentDictionaryLanguage;
+	QString m_currentDictionaryLanguage;
 	QMap<QString, QString> m_listOfAvailableLanguages;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // LINKGRAMMARWRAPPER_H
