@@ -16,7 +16,7 @@ class BgGrammarCheck;
 class GrammarCheckMenu;
 class GrammarCheck : public KoTextEditingPlugin
 {
-  Q_OBJECT
+    Q_OBJECT
 public:
 	GrammarCheck();
 	/// reimplemented from superclass
@@ -33,6 +33,7 @@ public:
 	void findSentencesInBlock(QTextBlock *block, QVector<QPair<int,int> > &sentencesInCurrentBlock);
 	bool isSentenceComplete(QTextDocument *document, int startPosition, int endPosition);
 	void checkSentencesNearPosition(QTextDocument *document, int cursorPosition);
+	int numberOfWords(QTextDocument *document, int startPosition, int endPosition);
 	QStringList availableBackends() const;
 	QStringList availableLanguages() const;
 	QString defaultLanguage() const;
@@ -54,20 +55,20 @@ private:
 	struct GrammarSentence {
 		GrammarSentence(QTextDocument *doc, int start, int end)
 		: document(doc)
-        {
+		{
 			from = start;
 			to = end;
-        }
+		}
 		QPointer<QTextDocument> document;
 		int from;
 		int to;
-    };
+	};
 	QQueue<GrammarSentence> m_documentsQueue;
 	bool m_enableGrammarCheck;
 	bool m_isChecking;
 	QTextStream stream;
 	GrammarCheckMenu *m_GrammarCheckMenu;
 	GrammarSentence m_activeSection; // the section we are currently doing a run on;
-	bool m_simpleEdit; //set when user is doing a simple edit, meaning we should ignore documentChanged
+	bool m_simpleEdit; //set when user is doing a simple edit, meaning we should ignore documentCanged
 };
 #endif
