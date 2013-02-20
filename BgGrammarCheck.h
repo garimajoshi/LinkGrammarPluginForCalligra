@@ -1,19 +1,22 @@
 #ifndef BGGRAMMARCHECK_H
 #define BGGRAMMARCHECK_H
 
-#include "LinkGrammerWrapper.h"
+#include "LinkGrammarWrapper.h"
 #include <QTextCursor>
 #include <kdecore_export.h>
 #include <QtCore/QObject>
+
+class KConfig;
 
 class QTextDocument;
 
 class KDECORE_EXPORT BgGrammarCheck : public QObject
 {
-    Q_OBJECT
+  Q_OBJECT
 public:
     explicit BgGrammarCheck(const LinkGrammarWrapper &grammarChecker, QObject *parent = 0);
     explicit BgGrammarCheck(QObject *parent = 0);
+    ~BgGrammarCheck();
     //input is just single sentence
     void startRun(QTextDocument *document, int startPosition, int endPosition);
     LinkGrammarWrapper grammarChecker();
@@ -41,4 +44,5 @@ private:
     int m_endPosition;
     QString m_currentSentence;
 };
+
 #endif
