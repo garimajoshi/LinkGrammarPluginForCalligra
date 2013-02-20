@@ -74,7 +74,7 @@ void LinkGrammarWrapper::setDisjunctCount(int count)
 	m_disjunctCount = count;
 }
 
-QString LinkGrammarWrapper::getLanguage()
+QString LinkGrammarWrapper::getLanguage() const
 {
 	return m_languagePreference;
 }
