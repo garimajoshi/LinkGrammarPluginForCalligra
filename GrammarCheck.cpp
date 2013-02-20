@@ -9,6 +9,7 @@
 #include <KDebug>
 #include <KAction>
 #include <KToggleAction>
+#include <KConfigGroup>
 
 #include <QTextBlock>
 #include <QThread>
@@ -35,7 +36,7 @@ GrammarCheck::GrammarCheck()
 	KConfigGroup grammarConfig = KGlobal::config()->group("Grammar");
 	m_enableGrammarCheck = grammarConfig.readEntry("autoGrammarCheck", m_enableGrammarCheck);
 	grammarCheck->setChecked(m_enableGrammarCheck);
-	m_grammarChecker = LinkGrammar(grammarConfig.readEntry("defaultLanguage", "en_US"));
+	m_grammarChecker = LinkGrammarWrapper();
 	m_bgGrammarCheck = new BgGrammarCheck(m_grammarChecker, this);
 	m_grammarCheckMenu = new GrammarCheckMenu(m_grammarChecker, this);
 	QPair<QString, KAction*> pair = m_grammarCheckMenu->menuAction();
@@ -94,11 +95,11 @@ void GrammarCheck::checkSentencesNearPosition(QTextDocument *document, int curso
 	}
 }
 
-void GrammarCheck::findSentencesInBlock(QTextBlock *block, QVector<QPair<int,int> > &sentencesInCurrentBlock)
+void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<int,int> > &sentencesInCurrentBlock)
 {
 	//function divides block into a array of sentences
 	sentencesInCurrentBlock.clear();
-	QString textSegment = block->text();
+	QString textSegment = block.text();
 	QTextBoundaryFinder sentenceFinder(QTextBoundaryFinder::Sentence, textSegment);
 	sentenceFinder.toStart();
 	QTextBoundaryFinder::BoundaryReasons boundary = sentenceFinder.boundaryReasons();
@@ -147,7 +148,7 @@ bool GrammarCheck::isSentenceComplete(QTextDocument *document, int startPosition
 int GrammarCheck::numberOfWords(QTextDocument *document, int startPosition, int endPosition)
 {
 	//returns number of finished words in this segment
-	if(startPosition >= endPosition || startPosition < 0 || endPosition > document.characterCount() - 1)
+	if(startPosition >= endPosition || startPosition < 0 || endPosition > document->characterCount() - 1)
 	{
 		return 0;
 	}
@@ -216,7 +217,7 @@ void GrammarCheck::checkSection(QTextDocument *document, int startPosition, int 
 	bool sectionFinished = false;
 	while(!block.isValid() && !sectionFinished)
 	{
-		QVector<Qpair<int, int> > sentenceVector;
+		QVector<QPair<int, int> > sentenceVector;
 		findSentencesInBlock(block, sentenceVector);
 		for(int i = 0; i < sentenceVector.size(); i++)
 		{
@@ -240,24 +241,30 @@ void GrammarCheck::setDocument(QTextDocument *document)
 	if (m_document == document)
 		return;
 	if (m_document)
-		disconnect (document, SIGNAL(contentsChange(int,int,int)), this, SLOT(documentChanged(int,int,int)));
+		disconnect (document, SIGNAL(contentsChange(int, int, int)), this, SLOT(documentChanged(int, int, int)));
 	m_document = document;
-	connect (document, SIGNAL(contentsChange(int,int,int)), this, SLOT(documentChanged(int,int,int)));
+	connect (document, SIGNAL(contentsChange(int, int, int)), this, SLOT(documentChanged(int, int, int)));
 }
+
 
 QStringList GrammarCheck::availableBackends() const
 {
-	return m_grammarChecker.availableBackends();
+	return QStringList();
+	//TODO: define this function properly
+	//return m_grammarChecker.availableBackends();
 }
 
 QStringList GrammarCheck::availableLanguages() const
 {
-	return m_grammarChecker.availableLanguages();
+	return QStringList();
+	//TODO: define this function properly
+	//return m_grammarChecker.availableLanguages();
 }
 
 void GrammarCheck::setDefaultLanguage(const QString &language)
 {
-	m_grammarChecker.setDefaultLanguage(language);
+	//m_grammarChecker.setDefaultLanguage(language);
+	m_grammarChecker.setLanguage(language);
 	m_bgGrammarCheck->setDefaultLanguage(language);
 	if (m_enableGrammarCheck && m_document)
 	{
@@ -265,7 +272,7 @@ void GrammarCheck::setDefaultLanguage(const QString &language)
 	}
 }
 
-void GrammarCheck::setBackgroundvChecking(bool on)
+void GrammarCheck::setBackgroundGrammarChecking(bool on)
 {
 	if (m_enableGrammarCheck == on)
 		return;
@@ -289,7 +296,8 @@ void GrammarCheck::setBackgroundvChecking(bool on)
 
 QString GrammarCheck::defaultLanguage() const
 {
-	return m_linkGrammarWrapper.defaultLanguage();
+	return m_linkGrammarWrapper.getLanguage();
+	//return m_linkGrammarWrapper.defaultLanguage();
 }
 
 bool GrammarCheck::backgroundGrammarChecking()
@@ -297,13 +305,15 @@ bool GrammarCheck::backgroundGrammarChecking()
 	return m_enableGrammarCheck;
 }
 
-void GrammarCheck::highlightGrammaticallyIncorrect(const QString &word, int startPosition, int endPosition, bool grammaticallyIncorrect)
+void GrammarCheck::highlightGrammaticallyIncorrect(const QString &segment, int startPosition, int endPosition, bool grammaticallyIncorrect)
 {
 	if (!grammaticallyIncorrect)
 		return;
 	QTextBlock block = m_activeSection.document->findBlock(startPosition);
 	KoTextBlockData blockData(block);
 	blockData.appendMarkup(KoTextBlockData::Grammar, startPosition - block.position(), endPosition - block.position());
+	Q_UNUSED(segment);
+  
 }
 
 void GrammarCheck::documentChanged(int from, int minus, int plus)
@@ -320,7 +330,7 @@ void GrammarCheck::documentChanged(int from, int minus, int plus)
 			blockData.setMarkupsLayoutValidity(KoTextBlockData::Grammar, false);
 			if (m_simpleEdit) {
 				// if it's a simple edit we will wait until finishedWord
-				blockData.rebaseMarkups(KoTextBlockData::Grammar, from, plus - min);
+				blockData.rebaseMarkups(KoTextBlockData::Grammar, from, plus - minus);
 			} else {
 				checkSection(document, block.position(), block.position() + block.length() - 1);
 			}
@@ -380,15 +390,15 @@ void GrammarCheck::setCurrentCursorPosition(QTextDocument *document, int cursorP
 			KoTextBlockData::MarkupRange range = blockData.findMarkup(KoTextBlockData::Grammar, cursorPosition - block.position());
 			if (int length = range.lastChar - range.firstChar) {
 				QString segment = block.text().mid(range.firstChar, length);
-				m_GrammarCheckMenu->setGrammaticallyIncorrect(segment, block.position() + range.firstChar, length);
-				m_GrammarCheckMenu->setCurrentLanguage(m_bgGrammarCheck->currentLanguage());
-				m_GrammarCheckMenu->setVisible(true);
-				m_GrammarCheckMenu->setEnabled(true);
+				m_grammarCheckMenu->setGrammaticallyIncorrect(segment, block.position() + range.firstChar, length);
+				m_grammarCheckMenu->setCurrentLanguage(m_bgGrammarCheck->currentLanguage());
+				m_grammarCheckMenu->setVisible(true);
+				m_grammarCheckMenu->setEnabled(true);
 				return;
 			}
-			m_GrammarCheckMenu->setEnabled(false);
+			m_grammarCheckMenu->setEnabled(false);
 		} else {
-			m_GrammarCheckMenu->setEnabled(false);
+			m_grammarCheckMenu->setEnabled(false);
 		}
 	}
 }
