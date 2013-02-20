@@ -5,18 +5,19 @@
 #include <QCoreApplication>
 #include <QTextBlock>
 #include <KDebug>
+#include <QTimer>
 
-BgGrammarCheck::BgGrammarCheck(const LinkGrammarWrapper &grammarChecker, QObject *parent = 0)
+BgGrammarCheck::BgGrammarCheck(const LinkGrammarWrapper &grammarChecker, QObject *parent)
 :QObject(parent)
 {
     m_grammarChecker = grammarChecker;
-    QString lang = grammmarChecker.getLanguage();
+    QString lang = m_grammarChecker.getLanguage();
     if (lang.isEmpty())
         lang = "en_US";
     setDefaultLanguage(lang);
 }
 
-BgGrammarCheck::BgGrammarCheck(QObject *parent = 0)
+BgGrammarCheck::BgGrammarCheck(QObject *parent)
 :QObject(parent)
 {
     m_grammarChecker = LinkGrammarWrapper();
@@ -86,4 +87,4 @@ QString BgGrammarCheck::currentLanguage()
 //void BgGrammmarCheck::continueChecking()
 //TODO: implement remaining functions
 
-#include <BgGrammmarCheck.moc>
+#include <BgGrammarCheck.moc>
