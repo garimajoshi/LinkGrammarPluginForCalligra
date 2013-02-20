@@ -30,7 +30,7 @@ public:
 	///reimplemented from superclass
 	void setCurrentCursorPosition(QTextDocument *document, int cursorPosition);
 	void checkSentence(QTextDocument *document, int startPosition, int endPosition);
-	void findSentencesInBlock(QTextBlock *block, QVector<QPair<int,int> > &sentencesInCurrentBlock);
+	void findSentencesInBlock(const QTextBlock &block, QVector<QPair<int,int> > &sentencesInCurrentBlock);
 	bool isSentenceComplete(QTextDocument *document, int startPosition, int endPosition);
 	void checkSentencesNearPosition(QTextDocument *document, int cursorPosition);
 	int numberOfWords(QTextDocument *document, int startPosition, int endPosition);
@@ -66,8 +66,9 @@ private:
 	QQueue<GrammarSentence> m_documentsQueue;
 	bool m_enableGrammarCheck;
 	bool m_isChecking;
+	LinkGrammarWrapper m_grammarChecker;
 	QTextStream stream;
-	GrammarCheckMenu *m_GrammarCheckMenu;
+	GrammarCheckMenu *m_grammarCheckMenu;
 	GrammarSentence m_activeSection; // the section we are currently doing a run on;
 	bool m_simpleEdit; //set when user is doing a simple edit, meaning we should ignore documentCanged
 };
