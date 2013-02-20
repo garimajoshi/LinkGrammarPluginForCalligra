@@ -35,7 +35,6 @@ GrammarCheckMenu::~GrammarCheckMenu()
 
 void GrammarCheckMenu::createSuggestionsMenu()
 {
-	m_suggestions.clear();
 	m_suggestionsMenu->clear();
 	m_suggestionsMenu->addAction(m_ignoreSegmentAction);
 }
@@ -45,8 +44,8 @@ void GrammarCheckMenu::ignoreSegment()
 	if (m_currentGrammaticallyIncorrectSegment.isEmpty() || m_currentGrammaticallyIncorrectStartPosition < 0)
 		return;
 
-	//we have yet to add this functionality, so may be comment it for now
-	m_grammarChecker.addToSession(m_currentGrammaticallyIncorrectSegment);
+	//TODO: we have yet to add this functionality, so may be comment it for now
+	//m_grammarChecker.addToSession(m_currentGrammaticallyIncorrectSegment);
 
 	emit clearHighlightingForSegment(m_currentGrammaticallyIncorrectStartPosition, m_lengthGrammaticallyIncorrect);
 
@@ -54,7 +53,7 @@ void GrammarCheckMenu::ignoreSegment()
 	m_currentGrammaticallyIncorrectStartPosition = -1;
 }
 
-void GrammarCheckMenu::setGrammaticallyIncorrect(const QString segment, int position,int length)
+void GrammarCheckMenu::setGrammaticallyIncorrect(const QString &segment, int position, int length)
 {
 	m_currentGrammaticallyIncorrectSegment = segment;
 	m_lengthGrammaticallyIncorrect = length;
