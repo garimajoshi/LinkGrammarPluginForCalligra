@@ -1,8 +1,8 @@
 #ifndef LINKGRAMMARWRAPPER_H
 #define LINKGRAMMARWRAPPER_H
 
-class QString;
-class QMap;
+#include<QMap>
+#include<QString>
 
 #ifdef __cplusplus
 extern "C"
@@ -23,7 +23,7 @@ extern "C"
 		void setMaxTimeToParseInNumberOfSeconds(int numberOfSeconds);
 		int getDisjunctCount;
 		void setDisjunctCount(int count);
-		QString getLanguage();
+		QString getLanguage() const;
 		void setLanguage(QString language);
 		void addLanguageToSetOfSupportedLanguages(QString language, QString dictionaryPath = QString());
 		
