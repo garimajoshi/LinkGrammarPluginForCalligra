@@ -4,18 +4,19 @@
 #include <QObject>
 #include <QPair>
 
+#include "LinkGrammarWrapper.h"
+#include "GrammarCheck.h"
+
 class KActionMenu;
 class KAction;
 class KMenu;
 class QSignalMapper;
-class GrammerCheck;
-class LinkGrammarWrapper;
 
 class GrammarCheckMenu : public QObject
 {
   Q_OBJECT
 public:
-	explicit GrammarCheckMenu(const LinkGrammarWrapper &grammarChecker, GrammarCheck *grammarCheck)
+	explicit GrammarCheckMenu(const LinkGrammarWrapper &grammarChecker, GrammarCheck *grammarCheck);
 	~GrammarCheckMenu();
 	QPair<QString, KAction*> menuAction();
 	void setGrammaticallyIncorrect(const QString &segment, int position,int length);
@@ -26,9 +27,9 @@ signals:
 	void clearHighlightingForSegment(int startPosition, int length);
 private slots:
 	void createSuggestionsMenu();
-	void ignoreSegment()
+	void ignoreSegment();
 private:
-	GrammerCheck *m_grammarCheck;
+	GrammarCheck *m_grammarCheck;
 	LinkGrammarWrapper m_grammarChecker;
 	KActionMenu *m_suggestionsMenuAction;
 	KAction *m_ignoreSegmentAction;
