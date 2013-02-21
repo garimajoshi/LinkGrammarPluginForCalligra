@@ -1,5 +1,6 @@
 #include "BgGrammarCheck.h"
 #include "GrammarCheck.h"
+
 #include <KoCharacterStyle.h>
 #include <QTextDocument>
 #include <QCoreApplication>
@@ -7,7 +8,7 @@
 #include <KDebug>
 #include <QTimer>
 
-BgGrammarCheck::BgGrammarCheck(const LinkGrammarWrapper &grammarChecker, QObject *parent)
+BgGrammarCheck::BgGrammarCheck(const LinkGrammar &grammarChecker, QObject *parent)
 :QObject(parent)
 {
     m_grammarChecker = grammarChecker;
@@ -20,7 +21,7 @@ BgGrammarCheck::BgGrammarCheck(const LinkGrammarWrapper &grammarChecker, QObject
 BgGrammarCheck::BgGrammarCheck(QObject *parent)
 :QObject(parent)
 {
-    m_grammarChecker = LinkGrammarWrapper();
+    m_grammarChecker = LinkGrammar();
 }
 
 BgGrammarCheck::~BgGrammarCheck()
@@ -37,6 +38,11 @@ void BgGrammarCheck::setDefaultLanguage(const QString &language)
         m_defaultLanguage = m_defaultLanguage.left(index);
     }
 }
+
+void BgGrammarCheck::changeLanguage(const QString &lang)
+{
+    m_grammarChecker.setLanguage(lang);
+}    
 
 void BgGrammarCheck::startRun(QTextDocument *document, int startPosition, int endPosition)
 {
