@@ -1,7 +1,7 @@
 #ifndef BGGRAMMARCHECK_H
 #define BGGRAMMARCHECK_H
 
-#include "LinkGrammarWrapper.h"
+#include "LinkGrammar.h"
 #include <QTextCursor>
 #include <kdecore_export.h>
 #include <QtCore/QObject>
@@ -14,13 +14,13 @@ class KDECORE_EXPORT BgGrammarCheck : public QObject
 {
   Q_OBJECT
 public:
-    explicit BgGrammarCheck(const LinkGrammarWrapper &grammarChecker, QObject *parent = 0);
+    explicit BgGrammarCheck(const LinkGrammar &grammarChecker, QObject *parent = 0);
     explicit BgGrammarCheck(QObject *parent = 0);
     ~BgGrammarCheck();
     //input is just single sentence
     void startRun(QTextDocument *document, int startPosition, int endPosition);
-    LinkGrammarWrapper grammarChecker();
-    void setGrammarChecker(const LinkGrammarWrapper &grammarChecker);
+    LinkGrammar grammarChecker();
+    void setGrammarChecker(const LinkGrammar &grammarChecker);
     void checkCurrentSentence();
     void restore(KConfig *config);
     QString currentLanguage();
@@ -28,14 +28,14 @@ public:
 public slots:
     void setDefaultLanguage(const QString &language);
     void changeLanguage(const QString &lang);
-    QString language();
+   // QString language();
 
 signals:
     void grammaticallyIncorrectSegment(const QString &segment, int startPosition, int endPosition, bool incorrectGrammar);
     void done();
 private:
     QTextDocument *m_document;
-    LinkGrammarWrapper m_grammarChecker;
+    LinkGrammar m_grammarChecker;
     QString m_currentLanguage;
     QString m_currentCountry;
     QString m_defaultLanguage;
