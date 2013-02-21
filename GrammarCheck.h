@@ -2,7 +2,7 @@
 #define GRAMMARCHECK_H
 
 #include <KoTextEditingPlugin.h>
-#include "LinkGrammarWrapper.h"
+#include "LinkGrammar.h"
 #include <QTextCharFormat>
 #include <QTextDocument>
 #include <QPointer>
@@ -10,10 +10,12 @@
 #include <QTextLayout>
 #include <QTextStream>
 
+#include <GrammarCheckMenu.h>
+
 class QTextDocument;
 class QTextStream;
 class BgGrammarCheck;
-class GrammarCheckMenu;
+
 class GrammarCheck : public KoTextEditingPlugin
 {
     Q_OBJECT
@@ -49,7 +51,7 @@ private slots:
 	void setBackgroundGrammarChecking(bool b);
 	void documentChanged(int from, int minus, int plus);
 private:
-	LinkGrammarWrapper m_linkGrammarWrapper;
+	LinkGrammar m_linkGrammarWrapper;
 	QPointer<QTextDocument> m_document;
 	BgGrammarCheck *m_bgGrammarCheck;
 	struct GrammarSentence {
@@ -66,7 +68,7 @@ private:
 	QQueue<GrammarSentence> m_documentsQueue;
 	bool m_enableGrammarCheck;
 	bool m_isChecking;
-	LinkGrammarWrapper m_grammarChecker;
+	LinkGrammar m_grammarChecker;
 	QTextStream stream;
 	GrammarCheckMenu *m_grammarCheckMenu;
 	GrammarSentence m_activeSection; // the section we are currently doing a run on;
