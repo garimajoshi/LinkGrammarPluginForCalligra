@@ -1,100 +1,100 @@
-#include "LinkGrammarWrapper.h"
+#include "LinkGrammar.h"
 
 #include <QTextDocument>
 #include <QString>
 #include <QMap>
 #include <KDebug>
 
-LinkGrammarWrapper::LinkGrammarWrapper()
+LinkGrammar::LinkGrammar()
 {
     //add the default language to list of supported languages
-	addLanguageToSetOfSupportedLanguagesWithDictionaryPath("en");
+	//addLanguageToSetOfSupportedLanguagesWithDictionaryPath("en");
 	m_Opts = parse_options_create();
 	m_Dict = dictionary_create_lang("en");
 	m_languagePreference = "en";
 	// default max parsing time = 1
 	m_maxTimeToParseInNumberOfSeconds = 1;
 	// default disjunct count = 2
-	m_getDisjunctCount = 2;
+	m_disjunctCount = 2;
 }
 
-LinkGrammarWrapper::LinkGrammarWrapper(Dictionary dict, Parse_Options opts)
+LinkGrammar::LinkGrammar(Dictionary dict, Parse_Options opts)
 {
 	m_Opts = opts;
 	m_Dict = dict;
 	// default max parsing time = 1
 	m_maxTimeToParseInNumberOfSeconds = 1;
 	// default disjunct count = 2
-	m_getDisjunctCount = 2;
+	m_disjunctCount = 2;
 }
 
-LinkGrammarWrapper::~LinkGrammarWrapper()
+LinkGrammar::~LinkGrammar()
 {
 	cleanUp();
 	m_listOfAvailableLanguages.clear();
 }
 
-void LinkGrammarWrapper::cleanUpDictionary()
+void LinkGrammar::cleanUpDictionary()
 {
 	if(m_Dict)
 		dictionary_delete(m_Dict);
 	m_Dict = 0;
 }
 
-void LinkGrammarWrapper::cleanUpParseOptions()
+void LinkGrammar::cleanUpParseOptions()
 {
 	if(m_Opts)
 		parse_options_delete(m_Opts);
 	m_Opts = 0;
 }
 
-void LinkGrammarWrapper::cleanUp()
+void LinkGrammar::cleanUp()
 {
 	cleanUpParseOptions();
 	cleanUpDictionary();
 }
 
-int LinkGrammarWrapper::getMaxTimeToParseInNumberOfSeconds()
+int LinkGrammar::getMaxTimeToParseInNumberOfSeconds()
 {
 	return m_maxTimeToParseInNumberOfSeconds;
 }
 
-void LinkGrammarWrapper::setMaxTimeToParseInNumberOfSeconds(int numberOfSeconds)
+void LinkGrammar::setMaxTimeToParseInNumberOfSeconds(int numberOfSeconds)
 {
 	m_maxTimeToParseInNumberOfSeconds = numberOfSeconds;
 }
 
-int LinkGrammarWrapper::getDisjunctCount()
+int LinkGrammar::getDisjunctCount()
 {
 	return m_disjunctCount;
 }
 
-void LinkGrammarWrapper::setDisjunctCount(int count)
+void LinkGrammar::setDisjunctCount(int count)
 {
 	m_disjunctCount = count;
 }
 
-QString LinkGrammarWrapper::getLanguage() const
+QString LinkGrammar::getLanguage() const
 {
 	return m_languagePreference;
 }
 
-bool LinkGrammarWrapper::setLanguage(QString language)
+void LinkGrammar::setLanguage(const QString &language)
 {
 	m_languagePreference = language;
 }
-
+/*
 void LinkGrammarWrapper::addLanguageToSetOfSupportedLanguages(QString language, QString dictionaryPath = QString())
 {
 	m_listOfAvailableLanguages[languages] = dictionaryPath;
 }
-
-bool LinkGrammarWrapper::isLanguageAvailable(QString language)
+*/
+bool LinkGrammar::isLanguageAvailable(QString language)
 {
 	return m_listOfAvailableLanguages.contains(language);
 }
 
-bool LinkGrammarWrapper::parseSentence(QString givenSentence)
+bool LinkGrammar::parseSentence(QString givenSentence)
 {
 	if(!m_Dict)
 	{
@@ -109,8 +109,8 @@ bool LinkGrammarWrapper::parseSentence(QString givenSentence)
 		return true;
 	}
 	
-	parse_options_set_max_parse_time(m_Opts, maxTimeToParseInNumberOfSeconds);
-	parse_options_set_disjunct_cost(m_Opts, disjunctCount)
+	parse_options_set_max_parse_time(m_Opts, m_maxTimeToParseInNumberOfSeconds);
+	parse_options_set_disjunct_cost(m_Opts, m_disjunctCount);
 	
 	parse_options_set_min_null_count(m_Opts, 0);
 	parse_options_set_max_null_count(m_Opts, 0);
