@@ -1,6 +1,5 @@
 #include "GrammarCheckMenu.h"
 #include "GrammarCheck.h"
-#include "LinkGrammarWrapper.h"
 
 #include <KDebug>
 #include <KActionMenu>
@@ -8,7 +7,7 @@
 #include <KLocale>
 #include <QSignalMapper>
 
-GrammarCheckMenu::GrammarCheckMenu(const LinkGrammarWrapper &grammarChecker, GrammarCheck *grammarCheck)
+GrammarCheckMenu::GrammarCheckMenu(const LinkGrammar &grammarChecker, GrammarCheck *grammarCheck)
   : QObject(grammarCheck),
 	m_grammarCheck(grammarCheck),
 	m_grammarChecker(grammarChecker),
@@ -31,6 +30,11 @@ GrammarCheckMenu::GrammarCheckMenu(const LinkGrammarWrapper &grammarChecker, Gra
 GrammarCheckMenu::~GrammarCheckMenu()
 {
 
+}
+
+QPair<QString, KAction*> GrammarCheckMenu::menuAction()
+{
+	return QPair<QString, KAction*>("grammar_suggestions", m_suggestionsMenuAction);
 }
 
 void GrammarCheckMenu::createSuggestionsMenu()
