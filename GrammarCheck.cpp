@@ -36,7 +36,7 @@ GrammarCheck::GrammarCheck()
 	KConfigGroup grammarConfig = KGlobal::config()->group("Grammar");
 	m_enableGrammarCheck = grammarConfig.readEntry("autoGrammarCheck", m_enableGrammarCheck);
 	grammarCheck->setChecked(m_enableGrammarCheck);
-	m_grammarChecker = LinkGrammarWrapper();
+	m_grammarChecker = LinkGrammar();
 	m_bgGrammarCheck = new BgGrammarCheck(m_grammarChecker, this);
 	m_grammarCheckMenu = new GrammarCheckMenu(m_grammarChecker, this);
 	QPair<QString, KAction*> pair = m_grammarCheckMenu->menuAction();
