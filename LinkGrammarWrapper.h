@@ -1,31 +1,31 @@
-#ifndef LINKGRAMMARWRAPPER_H
-#define LINKGRAMMARWRAPPER_H
+#ifndef LINKGRAMMAR_H
+#define LINKGRAMMAR_H
 
 #include<QMap>
 #include<QString>
 
-#ifdef __cplusplus
 extern "C"
 {
 #include <link-grammar/link-includes.h>
-#endif
+}
     
-	class LinkGrammarWrapper
+	class LinkGrammar
 	{
 	public:
-		LinkGrammarWrapper();
-		LinkGrammarWrapper(Dictionary dict, Parse_Options opts);
-		~LinkGrammarWrapper();
-		bool parseSentence(const QString text) const;
+		LinkGrammar();
+		LinkGrammar(Dictionary dict, Parse_Options opts);
+		~LinkGrammar();
+		//bool parseSentence(const QString text) const;
+		bool parseSentence(const QString text);
 		void cleanUp();
 		bool isLanguageAvailable(QString language);
 		int getMaxTimeToParseInNumberOfSeconds();
 		void setMaxTimeToParseInNumberOfSeconds(int numberOfSeconds);
-		int getDisjunctCount;
+		int getDisjunctCount();
 		void setDisjunctCount(int count);
 		QString getLanguage() const;
-		void setLanguage(QString language);
-		void addLanguageToSetOfSupportedLanguages(QString language, QString dictionaryPath = QString());
+		void setLanguage(const QString &language);
+	//	void addLanguageToSetOfSupportedLanguages(QString language, QString dictionaryPath = QString());
 		
 	private:
 		void cleanUpDictionary();
@@ -39,8 +39,4 @@ extern "C"
 		QMap<QString, QString> m_listOfAvailableLanguages;
 	};
 	
-#ifdef __cplusplus
-}
-#endif
-
 #endif // LINKGRAMMARWRAPPER_H
