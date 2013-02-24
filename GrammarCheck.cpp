@@ -18,6 +18,8 @@
 #include <QTextCharFormat>
 #include <QTextBoundaryFinder>
 
+#define LOGIC_DEBUG 1
+
 GrammarCheck::GrammarCheck()
 : m_document(0)
 , m_bgGrammarCheck(0)
@@ -104,6 +106,10 @@ void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<i
 	sentenceFinder.toStart();
 	QTextBoundaryFinder::BoundaryReasons boundary = sentenceFinder.boundaryReasons();
 	int numSentences = 0, startPos = 0, endPos;
+	if(LOGIC_DEBUG)
+	{
+		KDebug(3100) << "BlockTextForSplitting:" << textSegment;
+	}
 	while(sentenceFinder.toNextBoundary() > 0)
 	{
 		boundary = sentenceFinder.boundaryReasons();
@@ -112,11 +118,26 @@ void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<i
 			endPos = sentenceFinder.position() - 1;
 			if(startPos < endPos)
 			{
+				if(LOGIC_DEBUG)
+				{
+					KDebug(3100) << "SentenceFound(Complete):" << textSegment.mid(startPos, (endPos - startPos + 1));
+				}
 				sentencesInCurrentBlock.append(qMakePair(startPos, endPos));
 				numSentences++;
 				startPos = endPos + 1;
 			}
 		}
+	}
+	//capture potentially incomplete last sentence
+	endPos = textSegment.length() - 1;
+	if(startPos < endPos)
+	{
+		if(LOGIC_DEBUG)
+		{
+			KDebug(3100) << "SentenceFound(Potentially-InComplete):" << textSegment.mid(startPos, (endPos - startPos + 1));
+		}
+		sentencesInCurrentBlock.append(qMakePair(startPos, endPos));
+		numSentences++;
 	}
 }
 
