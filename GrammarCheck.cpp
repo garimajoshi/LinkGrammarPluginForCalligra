@@ -103,22 +103,19 @@ void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<i
 	QTextBoundaryFinder sentenceFinder(QTextBoundaryFinder::Sentence, textSegment);
 	sentenceFinder.toStart();
 	QTextBoundaryFinder::BoundaryReasons boundary = sentenceFinder.boundaryReasons();
-	bool inSentence = ((boundary & QTextBoundaryFinder::StartWord) != 0);
 	int numSentences = 0, startPos = 0, endPos;
 	while(sentenceFinder.toNextBoundary() > 0)
 	{
 		boundary = sentenceFinder.boundaryReasons();
-		if((boundary & QTextBoundaryFinder::EndWord) && inSentence)
+		if((boundary & QTextBoundaryFinder::StartWord))
 		{
 			endPos = sentenceFinder.position() - 1;
-			sentencesInCurrentBlock.append(qMakePair(startPos, endPos));
-			inSentence = false;
-			numSentences++;
-		}
-		else if((boundary & QTextBoundaryFinder::StartWord))
-		{
-			inSentence = true;
-			startPos = sentenceFinder.position();
+			if(startPos < endPos)
+			{
+				sentencesInCurrentBlock.append(qMakePair(startPos, endPos));
+				numSentences++;
+				startPos = endPos + 1;
+			}
 		}
 	}
 }
