@@ -30,7 +30,7 @@ GrammarCheck::GrammarCheck()
 , m_simpleEdit(false)
 {
     /* setup actions for this plugin */
-	KAction *configureAction = new KAction(i18n("Configure &Grammar Checking..."), this);
+    KAction *configureAction = new KAction(i18n("Configure &Grammar Checking..."), this);
 	connect(configureAction, SIGNAL(triggered()), this, SLOT(configureGrammarCheck()));
 	addAction("tool_configure_grammarcheck", configureAction);
 	KToggleAction *grammarCheck = new KToggleAction(i18n("Auto Grammar Check"), this);
@@ -59,42 +59,7 @@ void GrammarCheck::finishedWord(QTextDocument *document, int cursorPosition)
 		return;
 	KoTextBlockData blockData(block);
 	blockData.setMarkupsLayoutValidity(KoTextBlockData::Grammar, false);
-	checkSentencesNearPosition(document, cursorPosition);
-}
-
-void GrammarCheck::checkSentencesNearPosition(QTextDocument *document, int cursorPosition)
-{
-	if(m_document != document)
-	{
-		return;
-	}
-	QTextBlock block = document->findBlock(cursorPosition);
-	if (!block.isValid())
-		return;
-	QVector<QPair<int,int> > sentencesInCurrentBlock;
-	findSentencesInBlock(block, sentencesInCurrentBlock);
-	int i;
-	bool found = false;
-	for(i = 0; i < sentencesInCurrentBlock.size(); i++)
-	{
-		if(sentencesInCurrentBlock[i].first + block.position() <= cursorPosition && sentencesInCurrentBlock[i].second + block.position() >= cursorPosition)
-		{
-			found = true;
-			break;
-		}
-	}
-	if(found)
-	{
-		if(isSentenceComplete(document, sentencesInCurrentBlock[i].first + block.position(), sentencesInCurrentBlock[i].second + block.position()))
-		{
-			checkSentence(document, sentencesInCurrentBlock[i].first + block.position(), sentencesInCurrentBlock[i].second + block.position());
-		}
-		if(i>=1 && numberOfWords(document, sentencesInCurrentBlock[i].first + block.position(), sentencesInCurrentBlock[i].second + block.position()) <= 2)
-		{
-			// if the sentence found was not the first sentence in the block and you have just started writing this new sentence, check last sentence too
-			checkSentence(document, sentencesInCurrentBlock[i-1].first + block.position(), sentencesInCurrentBlock[i-1].second + block.position());
-		}
-	}
+    checkSection(QTextDocument *document, block.position(), (block.position() + block.length() - 1));
 }
 
 void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<int,int> > &sentencesInCurrentBlock)
@@ -108,7 +73,7 @@ void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<i
 	int numSentences = 0, startPos = 0, endPos;
 	if(LOGIC_DEBUG)
 	{
-		KDebug(3100) << "BlockTextForSplitting:" << textSegment;
+		kDebug(31000) << "BlockTextForSplitting:" << textSegment;
 	}
 	while(sentenceFinder.toNextBoundary() > 0)
 	{
@@ -120,7 +85,7 @@ void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<i
 			{
 				if(LOGIC_DEBUG)
 				{
-					KDebug(3100) << "SentenceFound(Complete):" << textSegment.mid(startPos, (endPos - startPos + 1));
+					kDebug(31000) << "SentenceFound(Complete):" << textSegment.mid(startPos, (endPos - startPos + 1));
 				}
 				sentencesInCurrentBlock.append(qMakePair(startPos, endPos));
 				numSentences++;
@@ -134,32 +99,43 @@ void GrammarCheck::findSentencesInBlock(const QTextBlock &block, QVector<QPair<i
 	{
 		if(LOGIC_DEBUG)
 		{
-			KDebug(3100) << "SentenceFound(Potentially-InComplete):" << textSegment.mid(startPos, (endPos - startPos + 1));
+			kDebug(31000) << "SentenceFound(Potentially-InComplete):" << textSegment.mid(startPos, (endPos - startPos + 1));
 		}
-		sentencesInCurrentBlock.append(qMakePair(startPos, endPos));
-		numSentences++;
+        if(isSentenceComplete(block.document(), block.position() + startPos, block.position() + endPos))
+        {
+    	    sentencesInCurrentBlock.append(qMakePair(startPos, endPos));
+		    numSentences++;
+            if(LOGIC_DEBUG)
+    	    {
+			    kDebug(31000) << "Sentencedetected(Complete):" << textSegment.mid(startPos, (endPos - startPos + 1));
+		    }
+        }
 	}
 }
 
 bool GrammarCheck::isSentenceComplete(QTextDocument *document, int startPosition, int endPosition)
 {
+	kDebug(31000) << startPosition << ", " << endPosition;
 	//returns if this segment is a sentence or not syntactically
 	QTextCursor cursor(document);
 	cursor.setPosition(startPosition);
-	cursor.setPosition(endPosition, QTextCursor::KeepAnchor);
+	cursor.setPosition(endPosition+1, QTextCursor::KeepAnchor);
 	QString textSegment = cursor.selectedText();
-	
+	kDebug(31000) << textSegment;
 	static QString pre_punct = "[^A-Z][0-9a-z\\(\\)]{2}";
 	static QString post_punct = QRegExp::escape("\"[]()") + "\\x201C\\x201D\\x201E\\x201F";
 	static QString end_of_sentence = pre_punct + "[\\.\\?\\!][" + post_punct + "]?$";
-	static QString end_of_para = ".$";
+	//static QString end_of_para = ".$";
 	
-	QRegExp boundryRX("("+end_of_sentence+")|("+end_of_para+")");
+	//QRegExp boundryRX("("+end_of_sentence+")|("+end_of_para+")");
+	QRegExp boundryRX(end_of_sentence);
 	boundryRX.setPatternSyntax(QRegExp::RegExp2);
 	if(textSegment.contains(boundryRX))
 	{
+		kDebug(31000) << "sentence is complete";
 		return true;
 	}
+	kDebug(31000) << "sentence not complete";
 	return false;
 }
 
@@ -172,7 +148,7 @@ int GrammarCheck::numberOfWords(QTextDocument *document, int startPosition, int 
 	}
 	QTextCursor cursor(document);
 	cursor.setPosition(startPosition);
-	cursor.setPosition(endPosition, QTextCursor::KeepAnchor);
+	cursor.setPosition(endPosition+1, QTextCursor::KeepAnchor);
 	QString textSegment = cursor.selectedText();
 
 	//should we trim starting and trailing whiteSpaces from this text??
@@ -233,7 +209,7 @@ void GrammarCheck::checkSection(QTextDocument *document, int startPosition, int 
     }
 	QTextBlock block = document->findBlock(startPosition);
 	bool sectionFinished = false;
-	while(!block.isValid() && !sectionFinished)
+	while(block.isValid() && !sectionFinished)
 	{
 		QVector<QPair<int, int> > sentenceVector;
 		findSentencesInBlock(block, sentenceVector);
@@ -325,17 +301,21 @@ bool GrammarCheck::backgroundGrammarChecking()
 
 void GrammarCheck::highlightGrammaticallyIncorrect(const QString &segment, int startPosition, int endPosition, bool grammaticallyIncorrect)
 {
+	kDebug(31000) << "sent for highlighting" << startPosition << ", " << endPosition << ", " << segment;
 	if (!grammaticallyIncorrect)
 		return;
 	QTextBlock block = m_activeSection.document->findBlock(startPosition);
 	KoTextBlockData blockData(block);
-	blockData.appendMarkup(KoTextBlockData::Grammar, startPosition - block.position(), endPosition - block.position());
+	blockData.appendMarkup(KoTextBlockData::Grammar, startPosition - block.position(), startPosition - block.position() + segment.trimmed().length());
+
+	//blockData.appendMarkup(KoTextBlockData::Grammar, startPosition - block.position(), endPosition - block.position());
 	Q_UNUSED(segment);
   
 }
 
 void GrammarCheck::documentChanged(int from, int minus, int plus)
 {
+	kDebug(31000)<<"document changed" << from<<", "<<minus<<", "<<plus;
 	QTextDocument *document = qobject_cast<QTextDocument*>(sender());
 	if (document == 0)
 		return;
