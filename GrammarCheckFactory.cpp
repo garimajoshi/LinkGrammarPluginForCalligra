@@ -1,6 +1,7 @@
 #include "GrammarCheckFactory.h"
 #include "GrammarCheck.h"
 
+#include <KDebug>
 #include <KLocale>
 
 GrammarCheckFactory::GrammarCheckFactory()
@@ -12,5 +13,6 @@ GrammarCheckFactory::GrammarCheckFactory()
 
 KoTextEditingPlugin *GrammarCheckFactory::create() const
 {
+    kDebug(31000) << "grammarcheck factory created";
     return new GrammarCheck();
 }
